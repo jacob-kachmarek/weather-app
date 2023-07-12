@@ -42,6 +42,27 @@ function fetchAndDisplayWeather(city) {
                 .then(function(forecastData) {
                     var groupedData = groupForecastByDate(forecastData.list);
                     console.log(groupedData);
+                    var forecastContainer = document.getElementById('5-day-forecast');
+                    forecastContainer.innerHTML = '';
+
+                    for (var date in groupedData) {
+                        var forecastGroup = groupedData[date];
+
+                        var forecastDay = document.createElement('div');
+                        var forecastDate = document.createElement('h7');
+                        forecastDate.textContent = date;
+
+                        var hottestPoint = forecastGroup[7];
+                        var hottestTemp = hottestPoint.main.temp;
+
+                        
+                        var forecastItem = document.createElement('p');
+                        forecastItem.textContent = hottestTemp + "\u00b0f";
+                        forecastDay.appendChild(forecastItem);
+                        
+                        forecastContainer.appendChild(forecastDate);
+                        forecastContainer.appendChild(forecastDay);
+                    }
                 })
             
         });
