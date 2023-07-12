@@ -40,15 +40,34 @@ function fetchAndDisplayWeather(city) {
                     return response.json();
                 })
                 .then(function(forecastData) {
-                    console.log(forecastData);
+                    var groupedData = groupForecastByDate(forecastData.list);
+                    console.log(groupedData);
                 })
             
         });
 }
 
+function groupForecastByDate(forecastList) {
+    var groupedData = {};
+  
+    forecastList.forEach(function(forecast) {
+      var date = forecast.dt_txt.split(" ")[0]; 
+  
+      if (!groupedData[date]) {
+        groupedData[date] = [];
+      }
+  
+      groupedData[date].push(forecast);
+    });
+  
+    return groupedData;
+  }
 
 searchButton.addEventListener('click', function() {
     city = searchInput.value;
+    if (!searchInput.value) {
+        return
+    }
     fetchAndDisplayWeather(city);
     var searchedItems = document.createElement('button');
     searchedItems.textContent = city;
