@@ -2,8 +2,3 @@
     display: flex;
     flex-direction: row;
 }
-
-.make-column {
-    display: flex;
-    flex-direction: column;
-}
