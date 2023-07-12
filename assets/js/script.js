@@ -6,6 +6,7 @@ var displaySearch = document.getElementById('previous-search');
 var singleDayDisplay = document.getElementById('single-day-display');
 
 var city ;
+var currentDay = dayjs().format("M/D/YYYY");
 
 function fetchAndDisplayWeather(city) {
     var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey + "&units=imperial";
@@ -20,15 +21,15 @@ function fetchAndDisplayWeather(city) {
             var cityDisplay = document.createElement('div');
             var cityName = document.createElement('h5');
             var currentTemp = document.createElement('p');
-            var minTemp = document.createElement('p');
-            var maxTemp = document.createElement('p');
+            var windSpeed = document.createElement('p');
+            var humidity = document.createElement('p');
 
-            cityName.textContent = city;
+            cityName.textContent = city + " " + currentDay;
             currentTemp.textContent = "Current Temp: " + data.main.temp + "\u00B0F";
-            minTemp.textContent = "Min Temp: " + data.main.temp_min + "\u00B0F";
-            maxTemp.textContent = "Max Temp: " + data.main.temp_max + "\u00B0F";
+            windSpeed.textContent = "Wind Speed: " + data.wind.speed + " MPH";
+            humidity.textContent = "Humidity: " + data.main.humidity + " \%";
 
-            cityDisplay.append(cityName, currentTemp, minTemp, maxTemp);
+            cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
             singleDayDisplay.append(cityDisplay);
 
             console.log(data);
@@ -36,6 +37,7 @@ function fetchAndDisplayWeather(city) {
 }
 
 searchButton.addEventListener('click', function() {
+    searchInput.textContent = "";
     city = searchInput.value;
     fetchAndDisplayWeather(city);
 
