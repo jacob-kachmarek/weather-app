@@ -10,7 +10,6 @@ var currentDay = dayjs().format("M/D/YYYY");
 
 function fetchAndDisplayWeather(city) {
     var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey + "&units=imperial";
-
     fetch(queryURL)
         .then(function(response) {
             return response.json();
@@ -31,18 +30,30 @@ function fetchAndDisplayWeather(city) {
 
             cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
             singleDayDisplay.append(cityDisplay);
+        });
+}
 
-            console.log(data);
+function fetchGeo(city) {
+    city = searchInput.value;
+    var queryURLGeo = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=1&appid=" + APIKey;
+    fetch(queryURLGeo)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            var lat = data[0].lat;
+            var lon = data[0].lon;
+            console.log(lat, lon);
         });
 }
 
 searchButton.addEventListener('click', function() {
-    searchInput.textContent = "";
     city = searchInput.value;
     fetchAndDisplayWeather(city);
-
+    fetchGeo(city);
     var searchedItems = document.createElement('button');
     searchedItems.textContent = city;
+    searchInput.value = "";
     displaySearch.append(searchedItems);
     searchedItems.addEventListener('click', function() {
         fetchAndDisplayWeather(city);

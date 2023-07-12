@@ -7,11 +7,13 @@ li {
     list-style-type: none;
 }
 
-#display-search {
+#previous-search {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
 }
-
+#previous-search button {
+    margin: 3px;
+}
 #single-day-display {
     display: flex;
     flex-direction: column;
