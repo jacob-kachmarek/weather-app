@@ -22,6 +22,8 @@ function fetchAndDisplayWeather(city) {
             var currentTemp = document.createElement('p');
             var windSpeed = document.createElement('p');
             var humidity = document.createElement('p');
+            var lat = data.coord.lat;
+            var lon = data.coord.lon;
 
             cityName.textContent = city + " " + currentDay;
             currentTemp.textContent = "Current Temp: " + data.main.temp + "\u00B0F";
@@ -30,27 +32,24 @@ function fetchAndDisplayWeather(city) {
 
             cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
             singleDayDisplay.append(cityDisplay);
+            console.log(data);
+
+            var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey + "&units=imperial";
+            fetch(forecastURL)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(forecastData) {
+                    console.log(forecastData);
+                })
+            
         });
 }
 
-function fetchGeo(city) {
-    city = searchInput.value;
-    var queryURLGeo = "http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=1&appid=" + APIKey;
-    fetch(queryURLGeo)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            var lat = data[0].lat;
-            var lon = data[0].lon;
-            console.log(lat, lon);
-        });
-}
 
 searchButton.addEventListener('click', function() {
     city = searchInput.value;
     fetchAndDisplayWeather(city);
-    fetchGeo(city);
     var searchedItems = document.createElement('button');
     searchedItems.textContent = city;
     searchInput.value = "";
