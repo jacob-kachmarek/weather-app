@@ -33,6 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
           cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
           singleDayDisplay.append(cityDisplay);
+
+          var singleDayData = {
+            cityName: city + " " + currentDay,
+            currentTemp: "Current Temp: " + data.main.temp + "\u00B0F",
+            windSpeed: "Wind Speed: " + data.wind.speed + " MPH",
+            humidity: "Humidity: " + data.main.humidity + " \%"
+          };
+          
+          localStorage.setItem('singleDayData', JSON.stringify(singleDayData));
   
           var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey + "&units=imperial";
           fetch(forecastURL)
@@ -43,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
               var groupedData = groupForecastByDate(forecastData.list);
               var forecastContainer = document.getElementById('five-day-forecast');
               forecastContainer.innerHTML = '';
-  
+              var forecastData = [];
               for (var date in groupedData) {
                 var forecastGroup = groupedData[date];
                 var hottestPoint = forecastGroup[6];
@@ -65,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     forecastWind.textContent = "Wind Speed: " + windSpeed;
                     forecastHumidity.textContent = "Humidity: " + humidity + "\%";
                     forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
-                    forecastContainer.appendChild(forecastDay);
+                    forecastContainer.appendChild(forecastDay);    
                 }
               }
             });
