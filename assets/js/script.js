@@ -45,47 +45,57 @@ document.addEventListener('DOMContentLoaded', function() {
   
           var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey + "&units=imperial";
           fetch(forecastURL)
-            .then(function(response) {
-              return response.json();
-            })
-            .then(function(forecastData) {
-              var groupedData = groupForecastByDate(forecastData.list);
-              var forecastContainer = document.getElementById('five-day-forecast');
-              forecastContainer.innerHTML = '';
-              var forecastData = [];
-              for (var date in groupedData) {
-                var forecastGroup = groupedData[date];
-                var hottestPoint = forecastGroup[6];
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(forecastData) {
+    var groupedData = groupForecastByDate(forecastData.list);
+    var forecastContainer = document.getElementById('five-day-forecast');
+    forecastContainer.innerHTML = '';
+    var forecastData = [];
+    Object.keys(groupedData).slice(0, 5).forEach(function(date) {
+      var forecastGroup = groupedData[date];
+      var hottestTemp = -Infinity; 
+      var hottestPoint;
 
-                if (hottestPoint && hottestPoint.main && hottestPoint.main.temp && hottestPoint.wind && hottestPoint.wind.speed) {
-                    var hottestTemp = hottestPoint.main.temp;
-                    var windSpeed = hottestPoint.wind.speed;
-                    var humidity = hottestPoint.main.humidity;
-    
-                    var forecastDay = document.createElement('div');
-                    forecastDay.classList.add('forecast-day');
-                    var forecastDate = document.createElement('p');
-                    var forecastTemp = document.createElement('p');
-                    var forecastWind = document.createElement('p');
-                    var forecastHumidity = document.createElement('p');
-    
-                    forecastDate.textContent = date;
-                    forecastTemp.textContent = "Temp: " + hottestTemp + "\u00b0f";
-                    forecastWind.textContent = "Wind Speed: " + windSpeed;
-                    forecastHumidity.textContent = "Humidity: " + humidity + "\%";
-                    forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
-                    forecastContainer.appendChild(forecastDay);
-                    
-                    var forecastItem = {
-                        date: date,
-                        temperature: "Temp: " + hottestTemp + "\u00b0f",
-                        humidity: "Humidity: " + humidity + "\%",
-                    };
-                    forecastData.push(forecastItem);
-                }
-              }
-              localStorage.setItem('forecastData', JSON.stringify(forecastData));
-            });
+      forecastGroup.forEach(function(forecastPoint) {
+        if (forecastPoint.main && forecastPoint.main.temp && forecastPoint.wind && forecastPoint.wind.speed) {
+          var temperature = forecastPoint.main.temp;
+          if (temperature > hottestTemp) {
+            hottestTemp = temperature;
+            hottestPoint = forecastPoint;
+          }
+        }
+      });
+
+      if (hottestPoint) {
+        var windSpeed = hottestPoint.wind.speed;
+        var humidity = hottestPoint.main.humidity;
+
+        var forecastDay = document.createElement('div');
+        forecastDay.classList.add('forecast-day');
+        var forecastDate = document.createElement('p');
+        var forecastTemp = document.createElement('p');
+        var forecastWind = document.createElement('p');
+        var forecastHumidity = document.createElement('p');
+
+        forecastDate.textContent = date;
+        forecastTemp.textContent = "Temp: " + hottestTemp + "\u00b0f";
+        forecastWind.textContent = "Wind Speed: " + windSpeed;
+        forecastHumidity.textContent = "Humidity: " + humidity + "\%";
+        forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
+        forecastContainer.appendChild(forecastDay);
+
+        var forecastItem = {
+          date: date,
+          temperature: "Temp: " + hottestTemp + "\u00b0f",
+          humidity: "Humidity: " + humidity + "\%",
+        };
+        forecastData.push(forecastItem);
+      }
+    });
+    localStorage.setItem('forecastData', JSON.stringify(forecastData));
+  });
         });
     }
   
@@ -104,6 +114,74 @@ document.addEventListener('DOMContentLoaded', function() {
   
       return groupedData;
     }
+
+    function displaySavedData() {
+        var savedSingleDayData = localStorage.getItem('singleDayData');
+        if (savedSingleDayData) {
+          var singleDayData = JSON.parse(savedSingleDayData);
+    
+          var cityDisplay = document.createElement('div');
+          var cityName = document.createElement('h5');
+          var currentTemp = document.createElement('p');
+          var windSpeed = document.createElement('p');
+          var humidity = document.createElement('p');
+    
+          cityName.textContent = singleDayData.cityName;
+          currentTemp.textContent = singleDayData.currentTemp;
+          windSpeed.textContent = singleDayData.windSpeed;
+          humidity.textContent = singleDayData.humidity;
+    
+          cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
+          singleDayDisplay.append(cityDisplay);
+        }
+    
+        var savedForecastData = localStorage.getItem('forecastData');
+        if (savedForecastData) {
+          var forecastData = JSON.parse(savedForecastData);
+          var forecastContainer = document.getElementById('five-day-forecast');
+          forecastContainer.innerHTML = '';
+    
+          forecastData.forEach(function(forecastItem) {
+            var forecastDay = document.createElement('div');
+            forecastDay.classList.add('forecast-day');
+            forecastDay.style.border = '1px solid black';
+    
+            var forecastDate = document.createElement('p');
+            forecastDate.textContent = forecastItem.date;
+    
+            var forecastTemp = document.createElement('p');
+            forecastTemp.textContent = forecastItem.temperature;
+    
+            var forecastWind = document.createElement('p');
+            forecastWind.textContent = forecastItem.windSpeed;
+    
+            var forecastHumidity = document.createElement('p');
+            forecastHumidity.textContent = forecastItem.humidity;
+    
+            forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
+            forecastContainer.appendChild(forecastDay);
+
+            
+          });
+        }
+        var savedButtons = localStorage.getItem('buttons');
+        if (savedButtons) {
+          displaySearch.innerHTML = savedButtons;
+          addEventListenersToButtons();
+        }
+    
+    }
+
+    function addEventListenersToButtons() {
+      var buttons = displaySearch.querySelectorAll('button');
+      buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+          var clickedCity = button.textContent;
+          fetchAndDisplayWeather(clickedCity);
+        });
+      });
+    }  
+    
   
     searchButton.addEventListener('click', function() {
       city = searchInput.value;
@@ -118,7 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
       searchedItems.addEventListener('click', function() {
         fetchAndDisplayWeather(city);
       });
+        localStorage.setItem("buttons", (displaySearch.innerHTML));
     });
+
   
     displaySearch.addEventListener('click', function(event) {
       if (event.target.tagName === 'BUTTON') {
@@ -126,4 +206,5 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchAndDisplayWeather(clickedCity);
       }
     });
+    displaySavedData();
   });
