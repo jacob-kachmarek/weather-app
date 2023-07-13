@@ -11,10 +11,32 @@ li {
     display: flex;
     flex-direction: column; 
 }
+
 #previous-search button {
     margin: 3px;
 }
+
 #single-day-display {
     display: flex;
     flex-direction: column;
 }
+
+#five-day-forecast {
+    display: flex;
+    flex-direction: row;
+    border: solid black 1px;
+    
+}
+
+#forecast-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 10px; 
+  }
+  
+  .forecast-day {
+    border: 1px solid black;
+    padding: 10px;
+    margin: 5px;
+  }
