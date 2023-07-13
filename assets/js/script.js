@@ -74,9 +74,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     forecastWind.textContent = "Wind Speed: " + windSpeed;
                     forecastHumidity.textContent = "Humidity: " + humidity + "\%";
                     forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
-                    forecastContainer.appendChild(forecastDay);    
+                    forecastContainer.appendChild(forecastDay);
+                    
+                    var forecastItem = {
+                        date: date,
+                        temperature: "Temp: " + hottestTemp + "\u00b0f",
+                        humidity: "Humidity: " + humidity + "\%",
+                    };
+                    forecastData.push(forecastItem);
                 }
               }
+              localStorage.setItem('forecastData', JSON.stringify(forecastData));
             });
         });
     }
