@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
     var city;
     var currentDay = dayjs().format("M/D/YYYY");
-  
+     // Function for fetching weather data for the given city
+    // and displaying it on the page
     function fetchAndDisplayWeather(city) {
       var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey + "&units=imperial";
       fetch(queryURL)
@@ -23,15 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
           var currentTemp = document.createElement('p');
           var windSpeed = document.createElement('p');
           var humidity = document.createElement('p');
+          var emojiEl = document.createElement('P');
           var lat = data.coord.lat;
           var lon = data.coord.lon;
-  
+          
           cityName.textContent = city + " " + currentDay;
           currentTemp.textContent = "Current Temp: " + data.main.temp + "\u00B0F";
           windSpeed.textContent = "Wind Speed: " + data.wind.speed + " MPH";
           humidity.textContent = "Humidity: " + data.main.humidity + " \%";
+          if (data.weather[0].main === "Clear") {
+            emojiEl.textContent = '☀️';
+          } else {
+            emojiEl.textContent = '☁️';
+          }
   
-          cityDisplay.append(cityName, currentTemp, windSpeed, humidity);
+          cityDisplay.append(cityName, emojiEl, currentTemp, windSpeed, humidity);
           singleDayDisplay.append(cityDisplay);
 
           var singleDayData = {
@@ -40,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             windSpeed: "Wind Speed: " + data.wind.speed + " MPH",
             humidity: "Humidity: " + data.main.humidity + " \%"
           };
-          
+          console.log(data);
           localStorage.setItem('singleDayData', JSON.stringify(singleDayData));
   
           var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey + "&units=imperial";
@@ -78,13 +85,21 @@ document.addEventListener('DOMContentLoaded', function() {
         var forecastTemp = document.createElement('p');
         var forecastWind = document.createElement('p');
         var forecastHumidity = document.createElement('p');
+        var emojiEl = document.createElement('P');
 
         forecastDate.textContent = date;
         forecastTemp.textContent = "Temp: " + hottestTemp + "\u00b0f";
         forecastWind.textContent = "Wind Speed: " + windSpeed;
         forecastHumidity.textContent = "Humidity: " + humidity + "\%";
-        forecastDay.append(forecastDate, forecastTemp, forecastWind, forecastHumidity);
+        if (data.weather[0].main === "Clear") {
+          emojiEl.textContent = '☀️';
+        } else {
+          emojiEl.textContent = '☁️';
+        }
+
+        forecastDay.append(forecastDate, emojiEl, forecastTemp, forecastWind, forecastHumidity);
         forecastContainer.appendChild(forecastDay);
+        console.log("five-day", data)
 
         var forecastItem = {
           date: date,
@@ -98,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
         });
     }
-  
+    // Function for grouping forecast data by date
     function groupForecastByDate(forecastList) {
       var groupedData = {};
   
@@ -114,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
       return groupedData;
     }
-
+    // Function for displaying previously saved weather and forecast data
     function displaySavedData() {
         var savedSingleDayData = localStorage.getItem('singleDayData');
         if (savedSingleDayData) {
@@ -171,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
     }
-
+    // Function for adding event listeners to the search history buttons
     function addEventListenersToButtons() {
       var buttons = displaySearch.querySelectorAll('button');
       buttons.forEach(function(button) {
@@ -182,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }  
     
-  
+  // Event listener for the search button click
     searchButton.addEventListener('click', function() {
       city = searchInput.value;
       if (!searchInput.value) {
@@ -199,12 +214,13 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem("buttons", (displaySearch.innerHTML));
     });
 
-  
+  // Event listener for the previous search history button click
     displaySearch.addEventListener('click', function(event) {
       if (event.target.tagName === 'BUTTON') {
         var clickedCity = event.target.textContent;
         fetchAndDisplayWeather(clickedCity);
       }
     });
+     // Function call to display previously saved weather and forecast data
     displaySavedData();
   });
